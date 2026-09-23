@@ -66,3 +66,26 @@ def test_add_order_invalid_status(order_tracker):
     with pytest.raises(ValueError):
         order_tracker.add_order("ORD_SHIPPED", "Laptop", 1, "CUST001", "bogus")
 
+
+def test_add_order_invalid_quantity(order_tracker):
+    with pytest.raises(ValueError):
+        order_tracker.add_order("ORD_SHIPPED", "Laptop", -1, "CUST001", "pending")
+
+def test_add_order_empty_order_id(order_tracker):
+    with pytest.raises(ValueError):
+        order_tracker.add_order("", "Laptop", 1, "CUST001", "pending")
+
+def test_get_order_by_id_success(order_tracker, mock_storage):
+    mock_storage.get_order.return_value = {
+        "order_id": "ORD_SHIPPED",
+        "item_name": "Laptop",
+        "quantity": 1,
+        "customer_id": "CUST001",
+        "status": "shipped",
+    }
+
+    result = order_tracker.get_order_by_id("ORD001")
+
+    assert result == mock_storage.get_order.return_value
+
+    mock_storage.get_order.assert_called_once_with("ORD001")
