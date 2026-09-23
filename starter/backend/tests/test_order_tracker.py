@@ -48,3 +48,21 @@ def test_add_order_raises_error_if_exists(order_tracker, mock_storage):
 
     with pytest.raises(ValueError):
         order_tracker.add_order("ORD_EXISTING", "Laptop", 1, "CUST001")
+
+def test_add_order_with_explicit_status(order_tracker, mock_storage):
+    order_tracker.add_order("ORD_SHIPPED", "Laptop", 1, "CUST001", "shipped")
+    mock_storage.save_order.assert_called_once_with(
+    "ORD_SHIPPED",
+    {
+        "order_id": "ORD_SHIPPED",
+        "item_name": "Laptop",
+        "quantity": 1,
+        "customer_id": "CUST001",
+        "status": "shipped",
+    }
+)
+
+def test_add_order_invalid_status(order_tracker):
+    with pytest.raises(ValueError):
+        order_tracker.add_order("ORD_SHIPPED", "Laptop", 1, "CUST001", "bogus")
+

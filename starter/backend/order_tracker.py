@@ -12,11 +12,22 @@ class OrderTracker:
             if not hasattr(storage, method) or not callable(getattr(storage, method)):
                 raise TypeError(f"Storage object must implement a callable '{method}' method.")
         self.storage = storage
+        self.VALID_STATUSES = {
+            "pending",
+            "processing",
+            "shipped"
+        }
 
     def add_order(self, order_id: str, item_name: str, quantity: int, customer_id: str, status: str = "pending"):
 
+        # Checking inputs first saves an unnecessary storage read operation
+        if status not in self.VALID_STATUSES:
+            raise ValueError(f"Invalid Status: {status}")
+
         if self.storage.get_order(order_id):
-            raise ValueError
+            raise ValueError("Order ID already exists")
+        
+        
 
         self.storage.save_order(order_id, {
             "order_id": order_id,
