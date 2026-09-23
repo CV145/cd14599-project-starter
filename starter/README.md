@@ -1,6 +1,9 @@
 # Udatracker Starter Code
 
-This directory contains the starter code for the Udatracker project. The initial structure of directories and files is described below.
+REFLECTION:
+- In list_orders_by_status I called self.list_all_orders() to retrieve the orders before filtering, reusing tested code. In add_order_api, I handled default values with .get() for optional status parameter.
+- One failed test revealed that add_order_api did not pass status to OrderTracker resulting in both orders defaulting to "pending". The API test caught a subtle bug that the unit tests couldn't see in isolation.
+- I would definitely implement a DELETE endpoint or integrate a schema library.
 
 ```
 .
