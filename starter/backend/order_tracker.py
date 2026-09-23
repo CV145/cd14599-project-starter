@@ -76,4 +76,16 @@ class OrderTracker:
         return orders
 
     def list_orders_by_status(self, status: str):
-        pass
+
+        # Guard clauses
+        if not status.strip():
+            raise ValueError("Status cannot be empty")
+        if status not in self.VALID_STATUSES:
+            raise ValueError("Invalid status")
+
+        orders = self.list_all_orders()
+
+        # List comprehension
+        filtered = [order for order in orders if order["status"] == status]
+
+        return filtered

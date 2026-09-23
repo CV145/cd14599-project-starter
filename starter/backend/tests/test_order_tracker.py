@@ -184,3 +184,92 @@ def test_list_all_orders_multiple_orders(order_tracker, mock_storage):
     assert len(orders) == len(mock_storage.get_all_orders.return_value)
     for order in orders:
         assert order == mock_storage.get_all_orders.return_value[order["order_id"]]
+
+
+def test_list_orders_by_status_empty_status(order_tracker):
+    with pytest.raises(ValueError):
+        order_tracker.list_orders_by_status("")
+
+def test_list_orders_by_status_whitespace_status(order_tracker):
+    with pytest.raises(ValueError):
+        order_tracker.list_orders_by_status(" ")
+
+def test_list_orders_by_status_invalid_status(order_tracker):
+     with pytest.raises(ValueError):
+        order_tracker.list_orders_by_status("bogus")
+
+def test_list_orders_by_status_empty_storage(order_tracker, mock_storage):
+    # Arrange
+    mock_storage.get_all_orders.return_value = {}
+
+    # Act
+    orders = order_tracker.list_orders_by_status("pending")
+
+    # Assert
+    mock_storage.get_all_orders.assert_called_once()
+    assert orders == []
+
+
+def test_list_orders_by_status_none_match(order_tracker, mock_storage):
+    # Arrange - configure the state of the system
+    mock_storage.get_all_orders.return_value = {
+        "ORD001": {
+            "order_id": "ORD001",
+            "item_name": "Laptop",
+            "quantity": 1,
+            "customer_id": "CUST001",
+            "status": "shipped"
+        },
+        "ORD002": {
+            "order_id": "ORD002",
+            "item_name": "Laptop",
+            "quantity": 5,
+            "customer_id": "CUST001",
+            "status": "shipped"
+        }
+    }
+
+    # Act - call the function
+    orders = order_tracker.list_orders_by_status("pending")
+
+    # Assert - because none match, result should be []
+    mock_storage.get_all_orders.assert_called_once()
+    assert orders == []
+
+
+
+def test_list_orders_by_status_some_match(order_tracker, mock_storage):
+    # Arrange - configure the state of the system
+    mock_storage.get_all_orders.return_value = {
+        "ORD001": {
+            "order_id": "ORD001",
+            "item_name": "Laptop",
+            "quantity": 1,
+            "customer_id": "CUST001",
+            "status": "shipped"
+        },
+        "ORD002": {
+            "order_id": "ORD002",
+            "item_name": "Laptop",
+            "quantity": 5,
+            "customer_id": "CUST001",
+            "status": "shipped"
+        },
+        "ORD003": {
+            "order_id": "ORD003",
+            "item_name": "Laptop",
+            "quantity": 5,
+            "customer_id": "CUST001",
+            "status": "pending"
+        }
+    }
+
+     # Act - call the function
+    orders = order_tracker.list_orders_by_status("shipped")
+
+    # Assert
+    mock_storage.get_all_orders.assert_called_once()
+    assert len(orders) == 2
+    for order in orders:
+        assert order["status"] == "shipped"
+    
