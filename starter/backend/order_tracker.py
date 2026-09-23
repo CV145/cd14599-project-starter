@@ -45,11 +45,29 @@ class OrderTracker:
         })
 
     def get_order_by_id(self, order_id: str):
+
+        if not order_id.strip():
+            raise ValueError("Order ID cannot be empty")
+
         # Fetch the order from storage and return it
         return self.storage.get_order(order_id)
 
     def update_order_status(self, order_id: str, new_status: str):
-        pass
+
+        if not order_id.strip():
+            raise ValueError("Order ID cannot be empty")
+
+        if new_status not in self.VALID_STATUSES:
+            raise ValueError("Not a valid status")
+
+        order = self.storage.get_order(order_id)
+
+        if order == None:
+            raise ValueError("Order does not exist")
+
+        order["status"] = new_status
+
+        return self.storage.save_order(order_id, order)
 
     def list_all_orders(self):
         pass
