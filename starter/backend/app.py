@@ -20,23 +20,36 @@ def add_order_api():
     data = request.get_json()
 
     # Extract the required fields and pass them into add_order
-    order_tracker.add_order(data["order_id"], data["item_name"], data["quantity"], data["customer_id"])
+    order_tracker.add_order(data["order_id"], data["item_name"], data["quantity"], data["customer_id"], data.get("status", "pending"))
 
-    # Serialize dictionary into HTTP JSON response
+    # Serialize dictionary back into HTTP JSON response
     return jsonify(data), 201
     
 
 @app.route('/api/orders/<string:order_id>', methods=['GET'])
 def get_order_api(order_id):
-    pass
+    data = order_tracker.get_order_by_id(order_id)
+    if data:
+        return jsonify(data), 200
+    elif data == None:
+        return jsonify({"error": "Order not found"}), 404
 
 @app.route('/api/orders/<string:order_id>/status', methods=['PUT'])
 def update_order_status_api(order_id):
-    pass
+    data = request.get_json()
+    order_tracker.update_order_status(order_id, data["new_status"])
+    order = order_tracker.get_order_by_id(order_id)
+    return jsonify(order), 200
 
 @app.route('/api/orders', methods=['GET'])
 def list_orders_api():
-    pass
+    orders = []
+    if request.args.get('status'):
+        orders = order_tracker.list_orders_by_status(request.args.get("status"))
+    else:
+        orders = order_tracker.list_all_orders()
+    
+    return jsonify(orders), 200
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True)
