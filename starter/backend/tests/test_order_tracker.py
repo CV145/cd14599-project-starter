@@ -12,9 +12,7 @@ def mock_storage():
     """
     mock = Mock()
     # By default, mock get_order to return None (no order found)
-    mock.get_order.return_value = {
-        "order_id": "ORD_EXISTING"
-    }
+    mock.get_order.return_value = None
     # By default, mock get_all_orders to return an empty dict
     mock.get_all_orders.return_value = {}
     return mock
@@ -42,6 +40,11 @@ def test_add_order_success(order_tracker, mock_storage):
     mock_storage.save_order.assert_called_once()
 
 
-def test_add_order_raises_error_if_exists():
+def test_add_order_raises_error_if_exists(order_tracker, mock_storage):
+
+    mock_storage.get_order.return_value = {
+        "order_id": "ORD_EXISTING"
+    }
+
     with pytest.raises(ValueError):
-        order_tracker.add_order("0RD001", "Laptop", 1, "CUST001")
+        order_tracker.add_order("ORD_EXISTING", "Laptop", 1, "CUST001")

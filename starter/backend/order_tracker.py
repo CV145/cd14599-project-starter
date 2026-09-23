@@ -14,6 +14,10 @@ class OrderTracker:
         self.storage = storage
 
     def add_order(self, order_id: str, item_name: str, quantity: int, customer_id: str, status: str = "pending"):
+
+        if self.storage.get_order(order_id):
+            raise ValueError
+
         self.storage.save_order(order_id, {
             "order_id": order_id,
             "item_name": item_name,
