@@ -22,8 +22,11 @@ def add_order_api():
     # Extract the required fields and pass them into add_order
     order_tracker.add_order(data["order_id"], data["item_name"], data["quantity"], data["customer_id"], data.get("status", "pending"))
 
-    # Serialize dictionary back into HTTP JSON response
-    return jsonify(data), 201
+    # Fetch and return the stored order
+    order = order_tracker.get_order_by_id(data["order_id"])
+
+    # Serialize order dictionary back into HTTP JSON response
+    return jsonify(order), 201
     
 
 @app.route('/api/orders/<string:order_id>', methods=['GET'])
@@ -31,7 +34,7 @@ def get_order_api(order_id):
     data = order_tracker.get_order_by_id(order_id)
     if data:
         return jsonify(data), 200
-    elif data == None:
+    elif data is None:
         return jsonify({"error": "Order not found"}), 404
 
 @app.route('/api/orders/<string:order_id>/status', methods=['PUT'])

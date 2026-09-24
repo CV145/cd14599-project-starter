@@ -34,10 +34,16 @@ def test_add_order_success(order_tracker, mock_storage):
     This method should add a new order, making sure it has valid fields and that no duplicate IDs are allowed.
     Consider when testing: default vs. explicit status; duplicate IDs; invalid quantity; missing required fields; invalid initial status
     """
-    order_tracker.add_order("0RD001", "Laptop", 1, "CUST001")
+    order_tracker.add_order("ORD001", "Laptop", 1, "CUST001")
 
     # Expects save_order to be called once to pass
-    mock_storage.save_order.assert_called_once()
+    mock_storage.save_order.assert_called_once_with("ORD001", {
+        "order_id": "ORD001",
+        "item_name": "Laptop",
+        "quantity": 1,
+        "customer_id": "CUST001",
+        "status": "pending",
+    })
 
 
 def test_add_order_raises_error_if_exists(order_tracker, mock_storage):

@@ -29,7 +29,7 @@ class OrderTracker:
             raise ValueError("Required fields cannot be empty")
         
         if not isinstance(quantity, int) or quantity <= 0:
-            raise ValueError("Quantitty must be a positive integer")
+            raise ValueError("Quantity must be a positive integer")
 
         if self.storage.get_order(order_id):
             raise ValueError("Order ID already exists")
@@ -62,7 +62,7 @@ class OrderTracker:
 
         order = self.storage.get_order(order_id)
 
-        if order == None:
+        if order is None:
             raise ValueError("Order does not exist")
 
         order["status"] = new_status
